@@ -1,0 +1,14 @@
+{
+    "name": "scraper_js",
+    "version": "0.0.1",
+    "description": "Web scraper in Node.js",
+    "main": "src/main.js",
+    "scripts": {
+      "start": "node src/main.js"
+    },
+    "dependencies": {
+        "axios": "0.19.2",
+        "cheerio": "1.0.0-rc.3",
+        "puppeteer": "2.1.1"
+    }
+}
