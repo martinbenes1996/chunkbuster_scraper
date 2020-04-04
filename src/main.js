@@ -1,20 +1,13 @@
 'use strict'
 
+const wizzair = require('./wizzair')
 
-const axios = require('axios')
-const cheerio = require('cheerio')
-var iconv = require('iconv-lite');
 
-const url = 'https://www.idnes.cz/'
 
-axios(url)
-  .then(response => {
-    const html = response.data;
-    const $ = cheerio.load(html, { decodeEntities: false });
-    let mainHeader = $('.opener').find('h3').html()
-    console.log(mainHeader)
-    let mainHeaderUtf8 = iconv.decode(mainHeader, 'windows-1250')
-    console.log(mainHeaderUtf8)
-    
-  })
-  .catch(console.error);
+
+
+
+wizzair.dates('NYO','VIE',new Date('2020-05-02'),new Date('2020-07-02'), data => console.log(data))
+
+wizzair.search('NYO','VIE',new Date('2020-05-02'), data => console.log(data))
+
