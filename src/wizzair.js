@@ -40,4 +40,7 @@ const search = (departureStation, arrivalStation, departureDate, callback) => {
     })
 }
 
-module.exports = {dates, search}
+module.exports = {
+    dates,
+    search
+}
