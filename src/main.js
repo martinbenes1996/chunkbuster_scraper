@@ -12,7 +12,7 @@ const currency = require('./currency')
 //ryanair.search('NYO','VIE',new Date('2020-05-15'), data => console.log(data))
 
 const updateFlight = async () => {
-    let flights = await wizzair.search('NYO','VIE',new Date('2020-05-02'))
+    let flights = await wizzair.search('NYO','VIE',new Date('2020-07-02'))
     console.log("Flights received.")
     console.log(flights)
     for(let flight in flights) {
@@ -32,6 +32,7 @@ const main = async () => {
     await db.addCompany({'id': 'ryanair', 'name': 'Ryanair'})
     await db.addCompany({'id': 'wizzair', 'name': 'Wizz Air'})
     await db.listCompanies((result) => console.log(result))
+    //await wizzair.dates("NYO","VIE",Date("2020-05-05"),Date("2020-07-01"), dates => console.log(dates))
     await updateFlight()
 }
 

@@ -83,8 +83,12 @@ const search = (departureStation, arrivalStation, departureDate) => {
         resolve(flights)
       })
     }).catch(err => {
-      console.error(err)
-      reject(err.message)
+      // no flights of given input
+      if(err.response.status == 404)
+        return resolve([])
+        
+      else // other error
+        reject(err.response)
     })
   })
 }
