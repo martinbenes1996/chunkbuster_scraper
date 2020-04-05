@@ -10,13 +10,9 @@ services:
         ports:
             - "3000:3000"
         depends_on:
-            - mysql
+            - mongo
         environment:
-            DATABASE_URL: "mysql://scraper:scraper12345@mysql/scrapes"
-    mysql:
-        image: mysql
+            DATABASE_URL: "mongodb://scraper_db:27017/"
+    mongo:
+        image: mongo
         container_name: scraper_db
-        environment:
-            MYSQL_DATABASE: scrapes
-            MYSQL_USER: scraper
-            MYSQL_PASSWORD: scraper12345
