@@ -1,5 +1,5 @@
 {
-    "name": "scraper_js",
+    "name": "chunkbuster_scraper",
     "version": "0.0.1",
     "description": "Web scraper in Node.js",
     "main": "src/main.js",

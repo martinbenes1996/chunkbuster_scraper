@@ -21,7 +21,9 @@ const dates = (departureStation, arrivalStation, from, to) => {
       resolve(response.data)
     }).catch(err => {
       if(err.response.status == 404)
-      reject([])
+        return resolve([])
+      else
+        reject(undefined)
     })
   })
     
