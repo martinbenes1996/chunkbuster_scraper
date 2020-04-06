@@ -80,11 +80,10 @@ const find_flight = async (flight_number, flight_date) => {
     // --- connect
     let client = await MongoClient.connect(URL, { useUnifiedTopology: true})
     let db = client.db(db_name)
-    let result = await db.collection(flights_collectionname).find(/*{flight_number: flight_number, 
-                                                                   datetime:      datetime_condition}*/).toArray()
+    let result = await db.collection(flights_collectionname).find({flight_number: flight_number, 
+                                                                   datetime:      datetime_condition}).toArray()
     client.close()
     // ---
-    console.log(result)
     if(!result.length)
         return undefined
     return result
