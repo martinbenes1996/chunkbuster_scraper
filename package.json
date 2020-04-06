@@ -1,10 +1,10 @@
 {
   "name": "@martinbenes1996/chunkbuster_scraper",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Web scraper for ChunkBuster project",
   "main": "src/init.js",
   "scripts": {
-    "start": "node src/init.js"
+    "start": "node src/init.js --unhandled-rejections=strict"
   },
   "dependencies": {
     "axios": "0.19.2",

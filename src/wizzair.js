@@ -1,31 +1,49 @@
 'use strict'
 
 const axios = require('axios')
+
 const common = require('./common')
+const db = require('./db')
 const fetcher = require('./fetcher')
+
+var url_api = undefined
 
 const inputDate = (dt) => {
     return dt.toISOString().slice(0,10)
 }
-
-const dates = (departureStation, arrivalStation, from, to) => {
-  return new Promise((resolve,reject) => {
-    let URL = 'https://be.wizzair.com/10.17.1/Api/search/flightDates?'
-    URL += common.encodeURIParameters({
-      departureStation,
-      arrivalStation,
-      from: inputDate(from),
-      to: inputDate(to)
-    })
-    axios(URL).then(response => {
-      resolve(response.data)
-    }).catch(err => {
-      if(err.response.status == 404)
-        return resolve([])
-      else
-        reject(undefined)
+const update_API_version = () => {
+  return new Promise((resolve, reject) => {
+    let URL = 'https://wizzair.com/buildnumber'
+    axios.get(URL).then(response => {
+      url_api = response.data.match(/https:\/\/be.wizzair.com\/[0-9]+\.[0-9]+\.[0-9]+/)[0]
+      console.log(url_api)
+      return url_api
     })
   })
+}
+
+const dates = async (departureStation, arrivalStation, from, to) => {
+  if(!url_api) {
+    url_api = await update_API_version()
+  }
+  let URL = url_api + '/Api/search/flightDates?'
+  URL += common.encodeURIParameters({
+    departureStation,
+    arrivalStation,
+    from: inputDate(from),
+    to: inputDate(to)
+  })
+  let response = await axios.get(URL).data
+  if(response.response.status == 200) {
+    return response.response.data
+  }
+  else if(response.response.status == 404) {
+    return []
+  }
+  else {
+    console.err(response.response.data)
+    return undefined
+  }
     
 }
 
@@ -45,8 +63,9 @@ const search = (departureStation, arrivalStation, departureDate) => {
       wdc: true
     }
     
-    let URL = 'https://be.wizzair.com/10.17.1/Api/search/search'
+    let URL = 'https://be.wizzair.com/10.18.0/Api/search/search'
     axios.post(URL, payload).then((response) => {
+      console.log("Request received")
       let flights = [], promises = []
       response.data.outboundFlights.forEach(fl => {
         let flight = {
@@ -84,6 +103,8 @@ const search = (departureStation, arrivalStation, departureDate) => {
             flight.fares = fares
             // add to flights
             flights.push(flight)
+          }).catch(err => {
+            console.error(err)
           })
         )
       })
@@ -91,9 +112,14 @@ const search = (departureStation, arrivalStation, departureDate) => {
         resolve(flights)
       })
     }).catch(err => {
+      console.error(err)
       // no flights of given input
       if(err.response.status == 404)
         return resolve([])
+      // WizzAir updated API
+      if(err.response.status == 503) {
+        console.log("trigger WizzAir API check")
+      }
 
       else // other error
         reject(err.response)
@@ -102,6 +128,7 @@ const search = (departureStation, arrivalStation, departureDate) => {
 }
 
 module.exports = {
+  update_API_version,
     dates,
     search
 }
