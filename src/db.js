@@ -1,28 +1,28 @@
 
 var MongoClient = require('mongodb').MongoClient
 
-
 var URL = process.env.DATABASE_URL
 var db_name = "db"
 
 var companies_collectionname = "companies"
 var flights_collectionname = "flights"
+var airports_collectionname = "airports"
 
-const addCompany = async (company, callback=res=>res) => {
+const addCompany = async (company) => {
     // --- connect
     let client = await MongoClient.connect(URL)
     let db = client.db(db_name)
     let existing = await findCompany(company.id)
     if(existing) {
         console.error("Given company_id already exists!")
-        return callback(false)
+        return false
     }
     await db.collection(companies_collectionname).insertOne(company)
     client.close()
     // ---
-    return callback(true)
+    return true
 }
-const findCompany = async (company_id, callback=res=>res) => {
+const findCompany = async (company_id) => {
     // --- connect
     let client = await MongoClient.connect(URL)
     let db = client.db(db_name)
@@ -30,17 +30,27 @@ const findCompany = async (company_id, callback=res=>res) => {
     client.close()
     // ---
     if(!result.length)
-        return callback(undefined)
-    return callback(result)
+        return undefined
+    return result
 }
-const listCompanies = async (callback=res=>res) => {
+const listCompanies = async () => {
     // --- connect
     let client = await MongoClient.connect(URL)
     let db = client.db(db_name)
     let result = await db.collection(companies_collectionname).find({}).toArray()
     client.close()
     // ---
-    return callback(result)
+    return result
+}
+const listCompanyAirports = async (company_id) => {
+    // --- connect
+    let client = await MongoClient.connect(URL)
+    let db = client.db(db_name)
+    let result = "TODO" // ...
+    client.close()
+    // ---
+    // ...
+    return result
 }
 
 const addFlight = async (flight) => {
@@ -57,7 +67,7 @@ const addFlight = async (flight) => {
     // ---
     return true
 }
-const findFlight = async (flight_number, datetime, callback=res=>res) => {
+const findFlight = async (flight_number, datetime) => {
     // --- connect
     let client = await MongoClient.connect(URL)
     let db = client.db(db_name)
@@ -65,17 +75,40 @@ const findFlight = async (flight_number, datetime, callback=res=>res) => {
     client.close()
     // ---
     if(!result.length)
-        return callback(undefined)
-    return callback(result)
+        return undefined
+    return result
 }
-const listFlights = async (callback=res=>res) => {
+const listFlights = async () => {
     // --- connect
     let client = await MongoClient.connect(URL)
     let db = client.db(db_name)
     let result = await db.collection(flights_collectionname).find({}).toArray()
     client.close()
     // ---
-    return callback(result)
+    return result
+}
+const findAirport = async (iata_code) => {
+    // --- connect
+    let client = await MongoClient.connect(URL)
+    let db = client.db(db_name)
+    let result = await db.collection(airports_collectionname).find({iata_code: iata_code}).toArray()
+    client.close()
+    // ---
+    if(!result.length) return undefined
+    return result[0]
+}
+const updateAirports = async (airports) => {
+    let promises = []
+    // --- connect
+    let client = await MongoClient.connect(URL)
+    let db = client.db(db_name)
+    for(let i in airports) {
+        let airport = airports[i]
+        let dbpromise = db.collection(airports_collectionname).updateOne({iata_code: airport.iata_code}, {$set: airport}, {upsert: true})
+        promises.push(dbpromise)
+    }
+    Promise.all(promises).then(() => {client.close(); console.log("Airports updated.")})
+    // ---
 }
 
 const init = async () => {
@@ -89,6 +122,9 @@ const init = async () => {
     try { // create collection "flights"
         await db.createCollection(flights_collectionname)
     } catch(err) { console.error(err) }
+    try { // create collection "airports"
+        await db.createCollection(airports_collectionname)
+    } catch(err) { console.error(err) }
     // add other collections
     // ...
 
@@ -98,8 +134,9 @@ const init = async () => {
 
 module.exports = {
     init, // initializer
-    addCompany, findCompany, listCompanies, // companies
+    addCompany, findCompany, listCompanies, listCompanyAirports, // companies
     addFlight, findCompany, listFlights, // flights
+    findAirport, updateAirports, // airports
 }
 
 

@@ -8,7 +8,8 @@ const inputDate = (dt) => {
     return dt.toISOString().slice(0,10)
 }
 
-const dates = (departureStation, arrivalStation, from, to, callback) => {
+const dates = (departureStation, arrivalStation, from, to) => {
+  return new Promise((resolve,reject) => {
     let URL = 'https://be.wizzair.com/10.17.1/Api/search/flightDates?'
     URL += common.encodeURIParameters({
       departureStation,
@@ -17,8 +18,13 @@ const dates = (departureStation, arrivalStation, from, to, callback) => {
       to: inputDate(to)
     })
     axios(URL).then(response => {
-      callback(response.data)
+      resolve(response.data)
+    }).catch(err => {
+      if(err.response.status == 404)
+      reject([])
     })
+  })
+    
 }
 
 const search = (departureStation, arrivalStation, departureDate) => {
@@ -43,7 +49,7 @@ const search = (departureStation, arrivalStation, departureDate) => {
       response.data.outboundFlights.forEach(fl => {
         let flight = {
           flight_number: fl.flightNumber,
-          carrier_cods: fl.carrierCode,
+          carrier_code: fl.carrierCode,
           departure_station: fl.departureStation,
           arrival_station: fl.arrivalStation,
           departure_datetime: fl.departureDateTime,
@@ -86,7 +92,7 @@ const search = (departureStation, arrivalStation, departureDate) => {
       // no flights of given input
       if(err.response.status == 404)
         return resolve([])
-        
+
       else // other error
         reject(err.response)
     })

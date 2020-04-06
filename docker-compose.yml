@@ -5,8 +5,7 @@ services:
         container_name: scraper
         command: npm start
         volumes:
-            - .:/usr/app
-            - /usr/app/node_modules
+            - ./src:/usr/app/src
         ports:
             - "3000:3000"
         depends_on:

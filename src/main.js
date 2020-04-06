@@ -12,7 +12,7 @@ const currency = require('./currency')
 //ryanair.search('NYO','VIE',new Date('2020-05-15'), data => console.log(data))
 
 const updateFlight = async () => {
-    let flights = await wizzair.search('NYO','VIE',new Date('2020-07-02'))
+    let flights = await wizzair.search('NYO','TZL',new Date('2020-05-31'))
     console.log("Flights received.")
     console.log(flights)
     for(let flight in flights) {
@@ -20,7 +20,6 @@ const updateFlight = async () => {
         console.log("Flight added.")
         console.log(status)
     }
-    
 }
 
 const convertCurrency = async () => {
@@ -32,8 +31,18 @@ const main = async () => {
     await db.addCompany({'id': 'ryanair', 'name': 'Ryanair'})
     await db.addCompany({'id': 'wizzair', 'name': 'Wizz Air'})
     await db.listCompanies((result) => console.log(result))
-    //await wizzair.dates("NYO","VIE",Date("2020-05-05"),Date("2020-07-01"), dates => console.log(dates))
+    //let dates = await wizzair.dates("NYO","TZL",new Date("2020-05-05"),new Date("2020-07-01"))
+    //console.log(dates)
     await updateFlight()
 }
 
-main()
+const getAirport = async () => {
+    let vienna = await db.findAirport("VIE")
+    console.log(vienna)
+} 
+
+//const updater = require('./updater')
+//updater.updateAirports()
+
+getAirport()
+
