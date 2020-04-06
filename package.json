@@ -1,17 +1,29 @@
 {
-    "name": "chunkbuster_scraper",
-    "version": "0.0.1",
-    "description": "Web scraper in Node.js",
-    "main": "src/main.js",
-    "scripts": {
-        "start": "node src/main.js"
-    },
-    "dependencies": {
-        "axios": "0.19.2",
-        "cheerio": "1.0.0-rc.3",
-        "csvtojson": "2.0.10",
-        "mongodb": "3.5.5",
-        "puppeteer": "2.1.1",
-        "iconv-lite": "0.5.1"
-    }
+  "name": "@martinbenes1996/chunkbuster_scraper",
+  "version": "0.0.1",
+  "description": "Web scraper in Node.js",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "node src/init.js"
+  },
+  "dependencies": {
+    "axios": "0.19.2",
+    "csvtojson": "2.0.10",
+    "mongodb": "3.5.5"
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/martinbenes1996/chunkbuster_scraper.git"
+  },
+  "keywords": [
+    "webscraping",
+    "mongodb"
+  ],
+  "author": "martinbenes1996",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/martinbenes1996/chunkbuster_scraper/issues"
+  },
+  "homepage": "https://github.com/martinbenes1996/chunkbuster_scraper#readme"
 }
