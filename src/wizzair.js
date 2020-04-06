@@ -47,88 +47,57 @@ const dates = async (departureStation, arrivalStation, from, to) => {
     
 }
 
-const search = (departureStation, arrivalStation, departureDate) => {
-  return new Promise((resolve,reject) => {
-    let payload = {
-      isFlightChange: false,
-      isSeniorOrStudent: false,
-      flightList: [{
-        departureStation,
-        arrivalStation,
-        departureDate: inputDate(departureDate)
-      }],
-      adultCount: 1,
-      childCount: 0,
-      infantCount: 0,
-      wdc: true
-    }
+const search = async (departureStation, arrivalStation, departureDate) => {
+  let payload = {
+    isFlightChange: false,
+    isSeniorOrStudent: false,
+    flightList: [{
+      departureStation,
+      arrivalStation,
+      departureDate: inputDate(departureDate)
+    }],
+    adultCount: 1,
+    childCount: 0,
+    infantCount: 0,
+    wdc: true
+  }
     
-    let URL = 'https://be.wizzair.com/10.18.0/Api/search/search'
-    axios.post(URL, payload).then((response) => {
-      console.log("Request received")
-      let flights = [], promises = []
-      response.data.outboundFlights.forEach(fl => {
-        let flight = {
-          flight_number: fl.flightNumber,
-          carrier_code: fl.carrierCode,
-          departure_station: fl.departureStation,
-          arrival_station: fl.arrivalStation,
-          departure_datetime: fl.departureDateTime,
-          arrival_datetime: fl.arrivalDateTime
-        }
-        
-        const parse_fares = async (fares) => {
-          let result = {}
-          return new Promise(async (resolveParseFares,rejectParseFares) => {
-            for(let fare in fares) {
-              let total = fares[fare].flightPriceDetail.total
-              let total_eur = await fetcher.convert_currency(total.amount, total.currencyCode, "EUR")
-              if(fares[fare].bundle == "plus") {
-                if(fares[fare].wdc) result.class1_member = total_eur
-                else result.class1 = total_eur
-              } else if(fares[fare].bundle == "middle") {
-                if(fares[fare].wdc) result.class2_member = total_eur
-                else result.class2 = total_eur
-              } else if(fares[fare].bundle == "basic") {
-                if(fares[fare].wdc) result.basic_member = total_eur
-                else result.basic = total_eur
-              }
-            }
-            resolveParseFares(result)
-          })
-        }
-
-        promises.push(
-          parse_fares(fl.fares).then(fares => {
-            flight.fares = fares
-            // add to flights
-            flights.push(flight)
-          }).catch(err => {
-            console.error(err)
-          })
-        )
-      })
-      Promise.all(promises).then(() => {
-        resolve(flights)
-      })
-    }).catch(err => {
-      console.error(err)
-      // no flights of given input
-      if(err.response.status == 404)
-        return resolve([])
-      // WizzAir updated API
-      if(err.response.status == 503) {
-        console.log("trigger WizzAir API check")
+  let URL = 'https://be.wizzair.com/10.18.0/Api/search/search'
+  let response = await axios.post(URL, payload)
+  console.log("Request received")
+  let flights = [], promises = []
+  for(let fl_idx in response.data.outboundFlights) {
+    let fl = response.data.outboundFlights[fl_idx]
+    let flight = {
+      flight_number: fl.flightNumber,
+      carrier_code: fl.carrierCode,
+      departure_station: fl.departureStation,
+      arrival_station: fl.arrivalStation,
+      departure_datetime: new Date(Date.parse(fl.departureDateTime)),
+      arrival_datetime: new Date(Date.parse(fl.arrivalDateTime)),
+      fares: {}
+    }
+    for(let fare in fl.fares) {
+      let total = fl.fares[fare].flightPriceDetail.total
+      let total_eur = await fetcher.convert_currency(total.amount, total.currencyCode, "EUR")
+      if(fl.fares[fare].bundle == "plus") {
+        if(fl.fares[fare].wdc) flight.fares.class1_member = total_eur
+        else flight.fares.class1 = total_eur
+      } else if(fl.fares[fare].bundle == "middle") {
+        if(fl.fares[fare].wdc) flight.fares.class2_member = total_eur
+        else flight.fares.class2 = total_eur
+      } else if(fl.fares[fare].bundle == "basic") {
+        if(fl.fares[fare].wdc) flight.fares.basic_member = total_eur
+        else flight.fares.basic = total_eur
       }
-
-      else // other error
-        reject(err.response)
-    })
-  })
+    }
+    flights.push(flight)
+  }
+  return flights
 }
 
 module.exports = {
   update_API_version,
-    dates,
-    search
+  dates,
+  search,
 }

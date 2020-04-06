@@ -1,6 +1,6 @@
 {
   "name": "@martinbenes1996/chunkbuster_scraper",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Web scraper for ChunkBuster project",
   "main": "src/init.js",
   "scripts": {

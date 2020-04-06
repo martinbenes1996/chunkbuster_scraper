@@ -12,17 +12,16 @@ const db = require('./db')
 
 
 const update_flight = async () => {
-    let flight_date = new Date('2020-05-31')
-    let flights = await wizzair.search('NYO','TZL',flight_date)
+    let flights = await wizzair.search('NYO','TZL',new Date('2020-05-31'))
     console.log("Flights received.")
-    console.log(flights)
     for(let flight in flights) {
         await db.update_flight(flights[flight])
         console.log("Flight added.")
     }
     console.log("finding flight")
-    let result_flights = await db.find_flight('4282',flight_date)
-    console.log(result_flights[0].records)
+    let result_flights = await db.find_flight('4282',new Date('2020-05-31'))
+    if(result_flights)
+        console.log(result_flights[0].records)
 }
 update_flight()
 //wizzair.update_API_version()

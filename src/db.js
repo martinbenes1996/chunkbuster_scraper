@@ -63,9 +63,11 @@ const update_flight = async (flight) => {
     if(!existing) {
         delete flight.fares
         flight.records = [ record ]
+        console.log("create new")
         await db.collection(flights_collectionname).insertOne(flight)
     } else {
         let updater = {$push:{records: record}}
+        console.log("update")
         await db.collection(flights_collectionname).updateOne({flight_number: flight.flight_number, datetime: flight.datetime}, updater)
     }
     await client.close()
@@ -73,15 +75,14 @@ const update_flight = async (flight) => {
     return true
 }
 const find_flight = async (flight_number, flight_date) => {
-    let dt_end = new Date()
+    let dt_end = new Date(flight_date)
     dt_end.setDate(flight_date.getDate() + 1)
     let datetime_condition = {$gte: flight_date, $lte: dt_end}
-    
     // --- connect
     let client = await MongoClient.connect(URL, { useUnifiedTopology: true})
     let db = client.db(db_name)
     let result = await db.collection(flights_collectionname).find({flight_number: flight_number, 
-                                                                   datetime:      datetime_condition}).toArray()
+                                                                   departure_datetime: datetime_condition}).toArray()
     client.close()
     // ---
     if(!result.length)
