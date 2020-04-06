@@ -15,6 +15,18 @@ const airports_from_ourairports = async () => {
     })
 }
 
+var base_url = 'https://api.exchangeratesapi.io/latest'
+const convert_currency = async (value, from, to) => {
+    return new Promise((resolve, reject) => {
+        let URL = base_url + `?base=${from}`
+        axios.get(URL).then(response => {
+            let result = value * response.data.rates[to]
+            resolve(result)
+        })
+    })
+}
+
 module.exports = {
-    airports_from_ourairports: airports_from_ourairports
+    airports_from_ourairports: airports_from_ourairports,
+    convert_currency: convert_currency
 }

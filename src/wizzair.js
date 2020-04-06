@@ -2,7 +2,7 @@
 
 const axios = require('axios')
 const common = require('./common')
-const currency = require('./currency')
+const fetcher = require('./fetcher')
 
 const inputDate = (dt) => {
     return dt.toISOString().slice(0,10)
@@ -58,12 +58,12 @@ const search = (departureStation, arrivalStation, departureDate) => {
           arrival_datetime: fl.arrivalDateTime
         }
         
-        const parseFares = async (fares) => {
+        const parse_fares = async (fares) => {
           let result = {}
           return new Promise(async (resolveParseFares,rejectParseFares) => {
             for(let fare in fares) {
               let total = fares[fare].flightPriceDetail.total
-              let total_eur = await currency.convert(total.amount, total.currencyCode, "EUR")
+              let total_eur = await fetcher.convert_currency(total.amount, total.currencyCode, "EUR")
               if(fares[fare].bundle == "plus") {
                 if(fares[fare].wdc) result.class1_member = total_eur
                 else result.class1 = total_eur
@@ -80,7 +80,7 @@ const search = (departureStation, arrivalStation, departureDate) => {
         }
 
         promises.push(
-          parseFares(fl.fares).then(fares => {
+          parse_fares(fl.fares).then(fares => {
             flight.fares = fares
             // add to flights
             flights.push(flight)

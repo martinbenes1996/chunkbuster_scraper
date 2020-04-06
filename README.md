@@ -1,2 +1,3 @@
-# scraper_js
-Webscraper for ChunkBuster
+# ChunkBuster WebScraper
+
+Webscraper for ChunkBuster.

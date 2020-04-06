@@ -8,7 +8,7 @@ var companies_collectionname = "companies"
 var flights_collectionname = "flights"
 var airports_collectionname = "airports"
 
-const addCompany = async (company) => {
+const add_company = async (company) => {
     // --- connect
     let client = await MongoClient.connect(URL)
     let db = client.db(db_name)
@@ -22,7 +22,7 @@ const addCompany = async (company) => {
     // ---
     return true
 }
-const findCompany = async (company_id) => {
+const find_company = async (company_id) => {
     // --- connect
     let client = await MongoClient.connect(URL)
     let db = client.db(db_name)
@@ -33,7 +33,7 @@ const findCompany = async (company_id) => {
         return undefined
     return result
 }
-const listCompanies = async () => {
+const list_companies = async () => {
     // --- connect
     let client = await MongoClient.connect(URL)
     let db = client.db(db_name)
@@ -42,7 +42,7 @@ const listCompanies = async () => {
     // ---
     return result
 }
-const listCompanyAirports = async (company_id) => {
+const list_company_airports = async (company_id) => {
     // --- connect
     let client = await MongoClient.connect(URL)
     let db = client.db(db_name)
@@ -53,7 +53,7 @@ const listCompanyAirports = async (company_id) => {
     return result
 }
 
-const addFlight = async (flight) => {
+const add_flight = async (flight) => {
     // --- connect
     let client = await MongoClient.connect(URL)
     let db = client.db(db_name)
@@ -67,7 +67,7 @@ const addFlight = async (flight) => {
     // ---
     return true
 }
-const findFlight = async (flight_number, datetime) => {
+const find_flight = async (flight_number, datetime) => {
     // --- connect
     let client = await MongoClient.connect(URL)
     let db = client.db(db_name)
@@ -78,7 +78,7 @@ const findFlight = async (flight_number, datetime) => {
         return undefined
     return result
 }
-const listFlights = async () => {
+const list_flights = async () => {
     // --- connect
     let client = await MongoClient.connect(URL)
     let db = client.db(db_name)
@@ -87,7 +87,7 @@ const listFlights = async () => {
     // ---
     return result
 }
-const findAirport = async (iata_code) => {
+const find_airport = async (iata_code) => {
     // --- connect
     let client = await MongoClient.connect(URL)
     let db = client.db(db_name)
@@ -97,7 +97,7 @@ const findAirport = async (iata_code) => {
     if(!result.length) return undefined
     return result[0]
 }
-const updateAirports = async (airports) => {
+const update_airports = async (airports) => {
     let promises = []
     // --- connect
     let client = await MongoClient.connect(URL)
@@ -113,7 +113,7 @@ const updateAirports = async (airports) => {
 
 const init = async () => {
     // --- connect
-    let client = await MongoClient.connect(URL + db_name)
+    let client = await MongoClient.connect(URL + db_name, { useUnifiedTopology: true})
     let db = client.db(db_name)
     
     try { // create collection "companies"
@@ -130,13 +130,23 @@ const init = async () => {
 
     client.close()
     // ---
+    console.log("MongoDB database initialized.")
 }
+init()
 
 module.exports = {
-    init, // initializer
-    addCompany, findCompany, listCompanies, listCompanyAirports, // companies
-    addFlight, findCompany, listFlights, // flights
-    findAirport, updateAirports, // airports
+    // companies
+    add_company: add_company,
+    find_company: find_company,
+    list_companies: list_companies,
+    list_company_airports: list_company_airports,
+    // flights
+    add_flight: add_flight,
+    find_flight: find_flight,
+    list_flights: list_flights,
+    // airports
+    find_airport: find_airport,
+    update_airports: update_airports,
 }
 
 

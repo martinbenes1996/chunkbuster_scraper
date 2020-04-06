@@ -1,8 +1,8 @@
 {
   "name": "@martinbenes1996/chunkbuster_scraper",
   "version": "0.0.1",
-  "description": "Web scraper in Node.js",
-  "main": "src/main.js",
+  "description": "Web scraper for ChunkBuster project",
+  "main": "src/init.js",
   "scripts": {
     "start": "node src/init.js"
   },

@@ -2,17 +2,14 @@
 const db = require('./db')
 const fetcher = require('./fetcher')
 
-
-const updateAirports = async () => {
+const update_airports = async () => {
     console.log("Fetching data from OurAirports.com...")
     fetcher.airports_from_ourairports().then(result => {
         console.log("Updating airports in MongoDB...")
-        db.updateAirports(result)
+        db.update_airports(result)
     })
 }
 
-
-
 module.exports = {
-    updateAirports: updateAirports
+    update_airports: update_airports
 }
