@@ -3,27 +3,25 @@ const axios = require('axios')
 const csv = require('csvtojson')
 
 const airports_from_ourairports = async () => {
-    return new Promise((resolve,reject) => {
-        axios.get('https://ourairports.com/data/airports.csv').then(response => {
-            csv()
-            .fromString(response.data)
-            .then(jsonObj => {
-                let airports_selection = jsonObj.filter(airport => {return airport.iata_code != ""})
-                resolve(airports_selection)
-            })
-        })
-    })
+    let response = await axios.get('https://ourairports.com/data/airports.csv')
+    let jsonObj = await csv().fromString(response.data)
+    let airports = jsonObj.filter(airport => {return airport.iata_code != ""})
+    return airports
 }
 
-var base_url = 'https://api.exchangeratesapi.io/latest'
 const convert_currency = async (value, from, to) => {
-    return new Promise((resolve, reject) => {
-        let URL = base_url + `?base=${from}`
-        axios.get(URL).then(response => {
-            let result = value * response.data.rates[to]
-            resolve(result)
-        })
-    })
+    if(from === to) return value
+    let URL = `https://api.exchangeratesapi.io/latest?base=${from}`
+    let response
+    try {
+        response = await axios.get(URL)
+    } catch(err) {
+        throw new Error(err.response.data.error)
+    }
+    if(!(to in response.data.rates))
+        throw new Error("Base '"+to+"' is not supported.")
+    let result = value * response.data.rates[to]
+    return result
 }
 
 module.exports = {

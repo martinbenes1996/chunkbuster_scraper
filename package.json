@@ -4,14 +4,19 @@
   "description": "Web scraper for ChunkBuster project",
   "main": "src/init.js",
   "scripts": {
-    "start": "node src/init.js --unhandled-rejections=strict"
+    "start": "node src/init.js --unhandled-rejections=strict",
+    "test": "NODE_ENV=test mocha tests/*.test.js"
   },
   "dependencies": {
     "axios": "0.19.2",
     "csvtojson": "2.0.10",
     "mongodb": "3.5.5"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "mocha": "7.1.1",
+    "chai": "4.2.0",
+    "chai-as-promised": "7.1.1"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/martinbenes1996/chunkbuster_scraper.git"

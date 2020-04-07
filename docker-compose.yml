@@ -12,6 +12,17 @@ services:
             - mongo
         environment:
             DATABASE_URL: "mongodb://scraper_db:27017/"
+    test:
+        build: .
+        container_name: scraper_test
+        command: npm test
+        volumes:
+            - ./src:/usr/app/src
+            - ./tests:/usr/app/tests
+        depends_on:
+            - mongo
+        environment:
+            DATABASE_URL: "mongodb://scraper_db:27017/"
     mongo:
         image: mongo
         container_name: scraper_db

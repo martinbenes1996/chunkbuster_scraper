@@ -1,34 +1,26 @@
 'use strict'
 
 const axios = require('axios')
-
-const common = require('./common')
+const querystring = require("querystring");
 
 const to_input_date = (dt) => {
     return dt.toISOString().slice(0,10)
 }
 
-const get_airport_meta = (code) => {
-    return new Promise((resolve,reject) => {
-        let URL = 'https://www.ryanair.com/api/locate/v1/autocomplete/airports?'
-        URL += common.encodeURIParameters({
-            phrase: code,
-            market: 'en-ie'
-        })
-        axios(URL).then(response => {
-            resolve(response.data)
-        }).catch(err => {
-            console.err(err.response)
-            reject(undefined)
-        }) 
+const get_airport_meta = async (code) => {
+    let URL = 'https://www.ryanair.com/api/locate/v1/autocomplete/airports?'
+    URL += querystring.stringify({
+        phrase: code,
+        market: 'en-ie'
     })
-    
+    let response = await axios.get(URL)
+    return response.data
 }
 
 const search = (departureStation, arrivalStation, departureDate, callback) => {
     return new Promise((resolve,reject) => {
         let URL = 'https://www.ryanair.com/api/booking/v4/en-ie/availability?'
-        URL += common.encodeURIParameters({
+        URL += querystring.stringify({
             ADT: 1,
             CHD: 0,
             DateIn: "",

@@ -1,8 +1,8 @@
 'use strict'
 
 const axios = require('axios')
+const querystring = require('querystring')
 
-const common = require('./common')
 const db = require('./db')
 const fetcher = require('./fetcher')
 
@@ -23,11 +23,9 @@ const update_API_version = () => {
 }
 
 const dates = async (departureStation, arrivalStation, from, to) => {
-  if(!url_api) {
-    url_api = await update_API_version()
-  }
+  if(!url_api) url_api = await update_API_version()
   let URL = url_api + '/Api/search/flightDates?'
-  URL += common.encodeURIParameters({
+  URL += querystring.stringify({
     departureStation,
     arrivalStation,
     from: inputDate(from),
@@ -61,8 +59,8 @@ const search = async (departureStation, arrivalStation, departureDate) => {
     infantCount: 0,
     wdc: true
   }
-    
-  let URL = 'https://be.wizzair.com/10.18.0/Api/search/search'
+  if(!url_api) url_api = await update_API_version()
+  let URL = url_api + '/Api/search/search?'
   let response = await axios.post(URL, payload)
   console.log("Request received")
   let flights = [], promises = []
@@ -97,7 +95,6 @@ const search = async (departureStation, arrivalStation, departureDate) => {
 }
 
 module.exports = {
-  update_API_version,
-  dates,
-  search,
+  dates: dates,
+  search: search,
 }

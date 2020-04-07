@@ -3,14 +3,16 @@
 
 const wizzair = require('./wizzair')
 const db = require('./db')
-//const ryanair = require('./ryanair')
+const ryanair = require('./ryanair')
 
 //wizzair.dates('NYO','VIE',new Date('2020-05-02'),new Date('2020-07-02'), data => console.log(data))
 
-//ryanair.airportMeta('NYO', data => console.log(data))
+ryanair.get_airport_meta('NYO').then(data => {
+    console.log(data)
+})
 //ryanair.search('NYO','VIE',new Date('2020-05-15'), data => console.log(data))
 
-
+/*
 const update_flight = async () => {
     let flights = await wizzair.search('NYO','TZL',new Date('2020-05-31'))
     console.log("Flights received.")
@@ -23,7 +25,8 @@ const update_flight = async () => {
     if(result_flights)
         console.log(result_flights[0].records)
 }
-update_flight()
+*/
+//update_flight()
 //wizzair.update_API_version()
 
 /*
