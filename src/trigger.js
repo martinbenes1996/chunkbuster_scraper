@@ -52,7 +52,7 @@ const update_wizzair = async () => {
                 }
                 
                 // ... // TODO
-                await new Promise(r => setTimeout(r,1500))
+                //await new Promise(r => setTimeout(r,1500))
             }
             
         }
