@@ -11,15 +11,11 @@ var url_api = undefined
 const inputDate = (dt) => {
     return dt.toISOString().slice(0,10)
 }
-const update_API_version = () => {
-  return new Promise((resolve, reject) => {
-    let URL = 'https://wizzair.com/buildnumber'
-    axios.get(URL).then(response => {
-      url_api = response.data.match(/https:\/\/be.wizzair.com\/[0-9]+\.[0-9]+\.[0-9]+/)[0]
-      console.log(url_api)
-      return url_api
-    })
-  })
+const update_API_version = async () => {
+  let URL = 'https://wizzair.com/buildnumber'
+  let response = await axios.get(URL)
+  url_api = response.data.match(/https:\/\/be.wizzair.com\/[0-9]+\.[0-9]+\.[0-9]+/)[0]
+  return url_api
 }
 
 const dates = async (departureStation, arrivalStation, from, to) => {
@@ -31,18 +27,55 @@ const dates = async (departureStation, arrivalStation, from, to) => {
     from: inputDate(from),
     to: inputDate(to)
   })
-  let response = await axios.get(URL).data
-  if(response.response.status == 200) {
-    return response.response.data
+  let response
+  try {
+    response = await axios.get(URL).data
+  } catch(err) {
+    if(err.response.status == 404) {
+      return []
+    }
+    else {
+      console.error(err.response.data)
+      return undefined
+    }
   }
-  else if(response.response.status == 404) {
+  return response
+}
+
+const airports = async () => {
+  console.log("airports")
+  if(!url_api) url_api = await update_API_version()
+  
+  let URL = url_api + '/Api/asset/map?languageCode=en-gb'
+  let body
+  try {
+    body = await axios.get(URL)
+  } catch(err) {
+    console.log(err)
+    console.error(err.response.data)
     return []
   }
-  else {
-    console.err(response.response.data)
-    return undefined
-  }
-    
+
+  let cities = body.data.cities.map(c => {
+    return {
+      iata_code: c.iata,
+      name: c.shortName,
+      latitude: c.latitude,
+      longitude: c.longitude,
+      currency: c.currencyCode,
+      country: c.countryCode,
+      country_name: c.countryName,
+      connections: c.connections.map(conn => {
+        return {
+          company_id: "wizzair",
+          iata_code: conn.iata,
+          domestic: conn.isDomestic,
+          new: conn.isNew
+        }
+      })
+    }
+  })
+  return cities
 }
 
 const search = async (departureStation, arrivalStation, departureDate) => {
@@ -95,6 +128,7 @@ const search = async (departureStation, arrivalStation, departureDate) => {
 }
 
 module.exports = {
+  airports: airports,
   dates: dates,
   search: search,
 }

@@ -102,10 +102,10 @@ const find_airport = async (iata_code) => {
     // --- connect
     let client = await MongoClient.connect(URL, { useUnifiedTopology: true})
     let db = client.db(db_name)
-    let result = await db.collection(airports_collectionname).find({iata_code: iata_code}).toArray()
-    client.close()
+    let result = await db.collection(airports_collectionname).find({iata_code}).toArray()
+    await client.close()
     // ---
-    if(!result.length) return undefined
+    if(!result.length) return {}
     return result[0]
 }
 const update_airports = async (airports) => {
@@ -115,11 +115,84 @@ const update_airports = async (airports) => {
     let db = client.db(db_name)
     for(let i in airports) {
         let airport = airports[i]
-        let dbpromise = db.collection(airports_collectionname).updateOne({iata_code: airport.iata_code}, {$set: airport}, {upsert: true})
+        let old_airport = await find_airport(airport.iata_code)
+        airport.connections = old_airport.connections || []
+        let dbpromise = db.collection(airports_collectionname).updateOne({iata_code: airport.iata_code}, {$set: airport }, {upsert: true})
         promises.push(dbpromise)
     }
-    Promise.all(promises).then(() => {client.close(); console.log("Airports updated.")})
+    await Promise.all(promises)
+    
+    client.close()
     // ---
+    console.log("Airports updated.")
+}
+
+const list_connections = async (iata_code) => {
+    // --- connect
+    let client = await MongoClient.connect(URL, {useUnifiedTopology: true})
+    let db = client.db(db_name)
+    let airport = await db.collection(airports_collectionname).find(
+            {iata_code}
+        ).toArray()
+    client.close()
+    // ---
+    return airport[0].connections
+}
+const find_connection = async (from, to) => {
+    // --- connect
+    let client = await MongoClient.connect(URL, {useUnifiedTopology: true})
+    let db = client.db(db_name)
+    let airports = await db.collection(airports_collectionname).find(
+            {iata_code: from,"connections.iata_code": to}
+        ).toArray()
+    client.close()
+    // ---
+    if(!airports.length) return []
+    let connections = airports[0].connections.filter(e => e.iata_code === to)
+    //console.log(`find_airport_connection(${from},${to}) -> ${JSON.stringify(connections)}`)
+    return connections
+}
+const update_connections = async (company_id, airports) => {
+    let promises = []
+    // --- connect
+    let client = await MongoClient.connect(URL, {useUnifiedTopology: true})
+    let db = client.db(db_name)
+    for(let i in airports) {
+        let airport = airports[i]
+        for (let j in airport.connections) {
+            let connection = airport.connections[j]
+            let airport_connections = await find_connection(
+                airport.iata_code,
+                connection.iata_code
+            )
+            // update existing connection
+            let connection_matches = e => e.company_id === company_id
+            if(airport_connections.some(connection_matches)) {
+                let promise = db.collection(airports_collectionname).
+                    updateOne({
+                            iata_code: airport.iata_code,
+                            "connections.company_id": company_id,
+                            "connections.iata_code": connection.iata_code
+                        },
+                        {$set: { "connections.$": connection} }
+                    )
+                promises.push(promise)
+            // create new connection
+            } else {
+                let promise = db.collection(airports_collectionname).
+                    updateOne(
+                        {iata_code: airport.iata_code},
+                        {$push: {connections: connection}}
+                    )
+                promises.push(promise)
+            }
+        }
+    }
+    await Promise.all(promises)
+    
+    client.close()
+    // ---
+    console.log(`Connections of ${company_id} updated.`)
 }
 
 const init = async () => {
@@ -158,6 +231,10 @@ module.exports = {
     // airports
     find_airport: find_airport,
     update_airports: update_airports,
+    // connections
+    find_connection: find_connection,
+    list_connections: list_connections,
+    update_connections: update_connections,
 }
 
 
