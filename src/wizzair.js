@@ -19,6 +19,7 @@ const update_API_version = async () => {
 }
 
 const dates = async (departureStation, arrivalStation, from, to) => {
+  console.log(`dates(${departureStation},${arrivalStation},${inputDate(from)},${inputDate(to)})`)
   if(!url_api) url_api = await update_API_version()
   let URL = url_api + '/Api/search/flightDates?'
   URL += querystring.stringify({
@@ -29,8 +30,9 @@ const dates = async (departureStation, arrivalStation, from, to) => {
   })
   let response
   try {
-    response = await axios.get(URL).data
+    response = await axios.get(URL)
   } catch(err) {
+    console.error("dates() error")
     if(err.response.status == 404) {
       return []
     }
@@ -39,11 +41,10 @@ const dates = async (departureStation, arrivalStation, from, to) => {
       return undefined
     }
   }
-  return response
+  return response.data.flightDates
 }
 
 const airports = async () => {
-  console.log("airports")
   if(!url_api) url_api = await update_API_version()
   
   let URL = url_api + '/Api/asset/map?languageCode=en-gb'
@@ -96,7 +97,7 @@ const search = async (departureStation, arrivalStation, departureDate) => {
   let URL = url_api + '/Api/search/search?'
   let response = await axios.post(URL, payload)
   console.log("Request received")
-  let flights = [], promises = []
+  let flights = []
   for(let fl_idx in response.data.outboundFlights) {
     let fl = response.data.outboundFlights[fl_idx]
     let flight = {

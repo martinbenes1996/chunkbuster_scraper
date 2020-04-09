@@ -13,7 +13,7 @@ const trigger = require('./trigger')
 })*/
 //ryanair.search('NYO','VIE',new Date('2020-05-15'), data => console.log(data))
 //trigger.update_airports()
-//trigger.update_wizzair().catch(err => console.error(err))
+trigger.update_wizzair().catch(err => console.error(err))
 /*
 const update_flight = async () => {
     let flights = await wizzair.search('NYO','TZL',new Date('2020-05-31'))
