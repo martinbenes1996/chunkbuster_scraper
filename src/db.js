@@ -63,15 +63,14 @@ const update_flight = async (flight) => {
     if(!existing) {
         delete flight.fares
         flight.records = [ record ]
-        console.log("create new")
         await db.collection(flights_collectionname).insertOne(flight)
     } else {
         let updater = {$push:{records: record}}
-        console.log("update")
         await db.collection(flights_collectionname).updateOne({flight_number: flight.flight_number, datetime: flight.datetime}, updater)
     }
     await client.close()
     // ---
+    console.log(`Flight ${flight.flight_number} updated.`)
     return true
 }
 const find_flight = async (flight_number, flight_date) => {

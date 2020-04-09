@@ -33,7 +33,7 @@ const update_wizzair = async () => {
             // stations
             let dep = airport.iata_code
             let arr = connection.iata_code
-            // fetch dates of flights <now, now+6mon>
+            // fetch dates of flights <now, now+2mon>
             let startdate = new Date(now.getTime())
             let enddate = new Date(now.getTime())
             enddate.setMonth(enddate.getMonth() + 2)
@@ -46,8 +46,13 @@ const update_wizzair = async () => {
                 let flights = await wizzair.search(dep,arr,flightdate)
                 console.log(flights)
                 // store in database
+                for(let f in flights) {
+                    let flight = flights[f]
+                    await db.update_flight(flight)
+                }
+                
                 // ... // TODO
-                await new Promise(r => setTimeout(r,3000))
+                await new Promise(r => setTimeout(r,1500))
             }
             
         }

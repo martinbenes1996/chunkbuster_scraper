@@ -6,35 +6,8 @@ const db = require('./db')
 const ryanair = require('./ryanair')
 const trigger = require('./trigger')
 
-//wizzair.dates('NYO','VIE',new Date('2020-05-02'),new Date('2020-07-02'), data => console.log(data))
-
-/*ryanair.get_airport_meta('NYO').then(data => {
-    console.log(data)
-})*/
-//ryanair.search('NYO','VIE',new Date('2020-05-15'), data => console.log(data))
 //trigger.update_airports()
-trigger.update_wizzair().catch(err => console.error(err))
-/*
-const update_flight = async () => {
-    let flights = await wizzair.search('NYO','TZL',new Date('2020-05-31'))
-    console.log("Flights received.")
-    for(let flight in flights) {
-        await db.update_flight(flights[flight])
-        console.log("Flight added.")
-    }
-    console.log("finding flight")
-    let result_flights = await db.find_flight('4282',new Date('2020-05-31'))
-    if(result_flights)
-        console.log(result_flights[0].records)
-}
-*/
-//update_flight()
-//wizzair.update_API_version()
-
-/*
-const convertCurrency = async () => {
-    fetcher.convert_currency(109, "SEK", "EUR", value => console.log(value))
-}*/
+//trigger.update_wizzair().catch(err => console.error(err))
 
 /*
 const main = async () => {
@@ -49,17 +22,17 @@ const main = async () => {
 */
 
 
-const getAirport = async () => {
+const get_airport = async () => {
     let airport = await db.find_airport("NYO")
     console.log(airport)
 }
-//getAirport()
+//get_airport()
 
-
-
-//const updater = require('./updater')
-//updater.updateAirports()
-//getAirport()
+const get_flights = async () => {
+    let flights = await db.list_flights()
+    console.log(flights[0].records)
+}
+get_flights()
 
 module.exports = {
     trigger: require('./trigger'),
