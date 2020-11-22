@@ -1,9 +1,11 @@
-version: '3'
+version: '3.5'
 services:
     scraper:
         build: .
         container_name: scraper
         command: npm start
+        networks:
+            - chunkbuster
         volumes:
             - ./src:/usr/app/src
         ports:
@@ -16,6 +18,8 @@ services:
         build: .
         container_name: scraper_test
         command: npm test
+        networks:
+            - chunkbuster
         volumes:
             - ./src:/usr/app/src
             - ./tests:/usr/app/tests
@@ -26,3 +30,10 @@ services:
     mongo:
         image: mongo
         container_name: scraper_db
+        networks:
+            - chunkbuster
+
+networks:
+    chunkbuster:
+        name: chunkbuster
+
